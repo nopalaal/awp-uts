@@ -8,8 +8,10 @@
     "sequelize": "^6.37.7",
     "sequelize-cli": "^6.6.3"
   },
-
   "scripts": {
-      "start": "nodemon ./app.js"
+    "start": "nodemon ./app.js"
+  },
+  "devDependencies": {
+    "sequelize-auto": "^0.8.8"
   }
 }
