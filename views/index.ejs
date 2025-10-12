@@ -3,11 +3,42 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= title %></title>
+  <title></title>
 </head>
 <body>
-  <h1>Welcome to <%= title %></h1>
-  <p>This is the home page.</p>
-  <a href="/users">Go to User List</a>
+  <table border="1">
+    <thead>
+
+      <tr>
+        <th>id</th>
+        <th>username</th>
+        <th>name</th>
+        <th>tanggal lahir</th>
+        <th>email</th>
+        <th>domisili</th>
+        <th>gender</th>
+        <th>photo profile</th>
+        <th>role</th>
+      </tr>
+    </thead>
+    <tr>
+      <tbody>
+        <% users.forEach(user => { %>
+          <tr>  
+            <td><%= user.idUser %></td>
+            <td><%= user.username %></td>
+            <td><%= user.nama %></td>
+            <td><%= user.tanggalLahir %></td>
+            <td><%= user.email %></td>
+            <td><%= user.domisili %></td>
+            <td><%= user.gender %></td>
+            <td><%= user.photo_profile %></td>
+            <td><%= user.role %></td>
+          </tr>
+          <% }) %>
+
+      </tbody>
+      </tr>
+    </table>
 </body>
 </html>
