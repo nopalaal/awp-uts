@@ -1,22 +1,15 @@
-const express = require('express');
-const mysql = require("mysql2");
-const app = express();
+const { Sequelize } = require('sequelize');
 
 
-const db = mysql.createConnection({
-        user: 'root',
-        host: 'localhost',
-        password: '',
-        database:'mudjarap',
-        port: 3310
+const db = new Sequelize('mudjarap', 'root', '', {
+  host: 'localhost',
+  dialect: 'mysql', 
+  port: 3310,
 });
 
-db.connect(err =>{
-        if(err){
-                console.log("ga konek");
-        }else{
-                console.log("selamat db nya jalan");
-        }
-})
 
+// db.authenticate()
+//   .then(() => console.log('Dbnya connect'))
+//   .catch(err => console.error('ga konek konek', err));
 
+  module.exports = db;
