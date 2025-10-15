@@ -4,10 +4,10 @@ const flash = require('express-flash');
 const expressLayouts = require('express-ejs-layouts');
 const path = require('path');
 const methodOverride = require('method-override');
-const { testConnection } = require('./src/models/database');
-const { setUserLocals } = require('./src/controllers/middleware/auth');
+//const { testConnection } = require('./src/models/database');
+const { setUserLocals } = require('./view/middleware/auth');
 const loginRoutes = require('./view/routes/login');
-const dashboardRoutes = require('./src/routes/dashboard');
+const dashboardRoutes = require('./view/routes/dashboard');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
