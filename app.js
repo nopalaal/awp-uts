@@ -9,22 +9,11 @@ const { setUserLocals } = require('./view/middleware/auth');
 const loginRoutes = require('./view/routes/login');
 const dashboardRoutes = require('./view/routes/dashboard');
 const app = express();
-const PORT = process.env.PORT || 3000;
-
-require('dotenv').config();
-
-app.use(expressLayouts);
-app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
-app.set('layout', 'layout');
+const port = 3000;
 
 app.get('/',(req,res)=>{
-        if (req.session && req.session.user){
-            res.redirect('/dashboard')
-        }
-        else {
-            res.redirect('/login')
-        }
+        res.send("hellooooo")
+
 })
 
 app.listen(PORT,()=>{
