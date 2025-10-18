@@ -3,9 +3,11 @@ require('dotenv').config();
 
 const env = process.env.NODE_ENV || 'development';
 const config = require('../../config/config.js')[env];
-const db = new Sequelize(config.database, config.username, config.password, config);
 
+console.log('Environment:', env);
 console.log('DB config:', config);
+
+const db = new Sequelize(config.database, config.username, config.password, config);
 // Optional: expose a quick test function if app.js expects it in the future
 async function testConnection() {
   try {
