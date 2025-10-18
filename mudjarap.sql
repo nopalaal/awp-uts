@@ -143,6 +143,7 @@ CREATE TABLE `task` (
 CREATE TABLE `user` (
   `idUser` int NOT NULL,
   `username` varchar(50) NOT NULL,
+  `password` varchar(255) NOT NULL,
   `nama` varchar(100) NOT NULL,
   `tanggalLahir` date DEFAULT NULL,
   `email` varchar(100) NOT NULL,
@@ -274,7 +275,16 @@ ALTER TABLE `task`
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `idUser` int NOT NULL AUTO_INCREMENT;
+  MODIFY `idUser` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- Dumping data for table `user`
+--
+
+INSERT INTO `user` (`idUser`, `username`, `password`, `nama`, `tanggalLahir`, `email`, `domisili`, `gender`, `photo_profile`, `role`) VALUES
+(1, 'admin', '$2b$10$XqJz4mKtJE/iEKHVFvDL9eGqSKI5rYO8RyJfXP4XqP5YYJPVqJ8M2', 'Administrator', '1990-01-01', 'admin@mudjarap.com', 'Jakarta', 'Pria', NULL, 'admin'),
+(2, 'manager', '$2b$10$XqJz4mKtJE/iEKHVFvDL9eGqSKI5rYO8RyJfXP4XqP5YYJPVqJ8M2', 'Manager User', '1995-05-15', 'manager@mudjarap.com', 'Bandung', 'Wanita', NULL, 'manager'),
+(3, 'user', '$2b$10$XqJz4mKtJE/iEKHVFvDL9eGqSKI5rYO8RyJfXP4XqP5YYJPVqJ8M2', 'Regular User', '2000-12-25', 'user@mudjarap.com', 'Surabaya', 'Pria', NULL, 'user');
 
 --
 -- Constraints for dumped tables

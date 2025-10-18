@@ -1,0 +1,198 @@
+<div
+  class="overflow-hidden rounded-2xl border border-gray-200 bg-white px-5 pt-5 dark:border-gray-800 dark:bg-white/[0.03] sm:px-6 sm:pt-6"
+>
+  <div class="flex items-center justify-between mb-4">
+    <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">
+      Demographic
+    </h3>
+
+    <div class="flex items-center gap-2">
+      <span class="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
+        <svg class="mr-1 h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
+        </svg>
+        <span id="totalUsers">0</span> Users
+      </span>
+    </div>
+  </div>
+
+  <div class="max-w-full overflow-x-auto custom-scrollbar">
+    <div class="-ml-5 min-w-[650px] pl-2 xl:min-w-full">
+      <div id="domicileChart" class="-ml-5 h-full min-w-[650px] pl-2 xl:min-w-full"></div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div id="chartLoading" class="text-center py-8">
+    <div class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent"></div>
+    <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">Memuat data...</p>
+  </div>
+
+  <!-- Error State -->
+  <div id="chartError" class="hidden text-center py-8">
+    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+    </svg>
+    <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">Gagal memuat data chart</p>
+  </div>
+</div>
+
+<script>
+  // Load and render domicile chart
+  document.addEventListener('DOMContentLoaded', async function() {
+    const chartContainer = document.getElementById('domicileChart');
+    const loadingElement = document.getElementById('chartLoading');
+    const errorElement = document.getElementById('chartError');
+    const totalUsersElement = document.getElementById('totalUsers');
+    
+    try {
+      // Fetch data from API
+      const response = await fetch('/dashboard/api/chart/domicile');
+      const result = await response.json();
+      
+      if (!result.success || !result.data || result.data.length === 0) {
+        throw new Error('No data available');
+      }
+
+      // Hide loading
+      loadingElement.style.display = 'none';
+      chartContainer.style.display = 'block';
+
+      // Prepare data for chart
+      const domiciles = result.data.map(item => item.domisili);
+      const totals = result.data.map(item => item.total);
+      const totalCount = totals.reduce((sum, val) => sum + val, 0);
+      
+      // Update total users
+      totalUsersElement.textContent = totalCount;
+
+      // Chart options
+      const options = {
+        series: [{
+          name: 'Jumlah User',
+          data: totals
+        }],
+        chart: {
+          type: 'bar',
+          height: 350,
+          toolbar: {
+            show: true,
+            tools: {
+              download: true
+            }
+          },
+          fontFamily: 'Outfit, sans-serif',
+          background: 'transparent'
+        },
+        plotOptions: {
+          bar: {
+            horizontal: false,
+            columnWidth: '55%',
+            borderRadius: 8,
+            dataLabels: {
+              position: 'top'
+            }
+          }
+        },
+        dataLabels: {
+          enabled: true,
+          formatter: function (val) {
+            return val;
+          },
+          offsetY: -20,
+          style: {
+            fontSize: '12px',
+            colors: ["#304758"]
+          }
+        },
+        stroke: {
+          show: true,
+          width: 2,
+          colors: ['transparent']
+        },
+        xaxis: {
+          categories: domiciles,
+          labels: {
+            style: {
+              colors: '#6b7280',
+              fontSize: '12px'
+            },
+            rotate: -45,
+            rotateAlways: domiciles.length > 5
+          }
+        },
+        yaxis: {
+          title: {
+            text: 'Jumlah User',
+            style: {
+              color: '#6b7280',
+              fontSize: '14px',
+              fontWeight: 600
+            }
+          },
+          labels: {
+            style: {
+              colors: '#6b7280'
+            }
+          }
+        },
+        fill: {
+          type: 'gradient',
+          gradient: {
+            shade: 'light',
+            type: "vertical",
+            shadeIntensity: 0.25,
+            gradientToColors: ['#465fff'],
+            inverseColors: false,
+            opacityFrom: 0.85,
+            opacityTo: 0.85,
+            stops: [50, 0, 100]
+          }
+        },
+        colors: ['#465fff'],
+        tooltip: {
+          theme: 'light',
+          y: {
+            formatter: function (val) {
+              return val + " user";
+            }
+          }
+        },
+        grid: {
+          borderColor: '#e5e7eb',
+          strokeDashArray: 4,
+          yaxis: {
+            lines: {
+              show: true
+            }
+          }
+        },
+        legend: {
+          show: false
+        }
+      };
+
+      // Render chart
+      const chart = new ApexCharts(chartContainer, options);
+      chart.render();
+
+      // Handle dark mode
+      const isDarkMode = document.documentElement.classList.contains('dark');
+      if (isDarkMode) {
+        chart.updateOptions({
+          chart: {
+            foreColor: '#9ca3af'
+          },
+          grid: {
+            borderColor: '#374151'
+          }
+        });
+      }
+
+    } catch (error) {
+      console.error('Error loading domicile chart:', error);
+      loadingElement.style.display = 'none';
+      errorElement.classList.remove('hidden');
+    }
+  });
+</script>
