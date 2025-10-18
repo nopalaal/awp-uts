@@ -1,59 +1,64 @@
 const express = require('express');
+const session = require('express-session');
+const flash = require('express-flash');
+const expressLayouts = require('express-ejs-layouts');
+const path = require('path');
+const methodOverride = require('method-override');
+const { testConnection } = require('./src/models/koneksi');
+const { setUserLocals } = require('./src/controller/middleware/auth');
+const loginRoutes = require('./src/routes/login');
+const dashboardRoutes = require('./src/routes/dashboard');
 const app = express();
-const path = require('path')
+const PORT = process.env.PORT || 3001;
 
-const { user, sequelize } = require('./models');
+require('dotenv').config();
 
-const port = 3000;
+// Set view engine dan views directory
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views/pages'));
 
+// Layouts harus setelah view engine
+app.use(expressLayouts);
+app.set('layout', false); // Disable default layout atau set ke path layout yang benar
 
-app.set('view engine','ejs');
-app.set('views', path.join(__dirname, 'views'));
+// Middleware untuk parsing request body
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
-// Serve static files
-app.use(express.static(path.join(__dirname, 'public')));
+// Middleware untuk static files
+app.use(express.static(path.join(__dirname, 'views')));
 app.use('/src', express.static(path.join(__dirname, 'src')));
 
-app.use(express.urlencoded({ extended: true }));
+// Session middleware
+app.use(session({
+    secret: process.env.SESSION_SECRET || 'your-secret-key-here',
+    resave: false,
+    saveUninitialized: false,
+    cookie: { maxAge: 24 * 60 * 60 * 1000 } // 24 jam
+}));
 
+// Flash messages
+app.use(flash());
 
-app.get('/', async (req,res)=>{
-    try{
-        const users = await user.findAll();
-        res.render('index',{users});
-        console.log(users);
-    } catch(err){
-        res.status(500).send(err.message);
-    }
+// Method override untuk PUT/DELETE
+app.use(methodOverride('_method'));
+
+// Set user locals middleware
+app.use(setUserLocals);
+
+// Routes
+app.use('/', loginRoutes);
+app.use('/dashboard', dashboardRoutes);
+
+app.get('/',(req,res)=>{
+        if (req.session && req.session.user){
+            res.redirect('/dashboard')
+        }
+        else {
+            res.redirect('/login')
+        }
 })
 
-app.post('/create', async(req,res)=>{
-    try{
-     const { username, nama, password,tanggalLahir, email, domisili, gender, photo_profile, role } = req.body;
-
-          await user.create({
-            username,
-            password,
-            nama,
-            tanggalLahir,
-            email,
-            domisili,
-            gender,
-            photo_profile,
-            role,
-        });
-
-        res.redirect('/'); 
-
-    } catch(err){
-        res.status(500).send(err.message);
-    }
-})
-
-sequelize.authenticate()
-.then(() => console.log('Dbnya connect'))
-.catch(err => console.error('ga konek konek', err));
-
-app.listen(port,()=>{
-    console.log(`http://localhost:${port}`)
+app.listen(PORT,()=>{
+    console.log(`http://localhost:${PORT}`)
 })
