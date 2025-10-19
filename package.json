@@ -1,4 +1,13 @@
 {
+  "name": "mudjarap",
+  "version": "1.0.0",
+  "description": "A web dashboard for Mudjarap event and task management",
+  "main": "app.js",
+  "license": "MIT",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
   "dependencies": {
     "@tailwindcss/cli": "^4.1.14",
     "apexcharts": "^5.3.5",

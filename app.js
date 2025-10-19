@@ -69,6 +69,14 @@ app.get('/',(req,res)=>{
         }
 })
 
+app.get('/logout',(req,res)=>{
+    req.session.destroy((err)=>{
+        console.log("error ga bisa logout" + err)
+    })
+    res.clearCookie('connect.sid');
+    res.redirect('/login');
+})
+
 app.listen(PORT,()=>{
     console.log(`http://localhost:${PORT}`)
 })
