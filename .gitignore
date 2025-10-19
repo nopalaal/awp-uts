@@ -8,6 +8,15 @@ yarn.lock
 .env.local
 .env.*.local
 
+# Google Drive API Credentials (NEVER COMMIT THESE!)
+src/config/credentials.json
+src/config/oauth-credentials.json
+src/config/oauth-token.json
+src/config/nifty-canyon-*.json
+
+# Uploaded files
+uploads/
+
 # Logs
 logs
 *.log

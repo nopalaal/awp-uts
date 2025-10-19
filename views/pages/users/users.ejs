@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Users - Mudjarap</title>
+
+    <link rel="stylesheet" href="/src/css/output.css" />
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    <style>
+      [x-cloak] { display: none !important; }
+    </style>
+  </head>
+  <body
+    x-data="{ 
+      page: 'users',
+      pageName: 'Users',
+      activePage: 'users', 
+      'loaded': true, 
+      'darkMode': false, 
+      'stickyMenu': false, 
+      'sidebarToggle': false, 
+      'scrollTop': false,
+      'selected': 'Tables'
+    }"
+    x-init="
+         darkMode = JSON.parse(localStorage.getItem('darkMode'));
+         $watch('darkMode', value => localStorage.setItem('darkMode', JSON.stringify(value)))"
+    :class="{'dark bg-gray-900': darkMode === true}"
+  >
+    <!-- ===== Preloader Start ===== -->
+    <%- include('../../partials/preloader.ejs') %>
+    <!-- ===== Preloader End ===== -->
+
+    <!-- ===== Page Wrapper Start ===== -->
+    <div class="flex h-screen overflow-hidden">
+      <!-- ===== Sidebar Start ===== -->
+      <%- include('../../partials/sidebar.ejs') %>
+      <!-- ===== Sidebar End ===== -->
+
+      <!-- ===== Content Area Start ===== -->
+      <div class="relative flex flex-1 flex-col overflow-y-auto overflow-x-hidden">
+        <!-- Small Device Overlay Start -->
+        <%- include('../../partials/overlay.ejs') %>
+        <!-- Small Device Overlay End -->
+
+        <!-- ===== Header Start ===== -->
+        <%- include('../../partials/header.ejs') %>
+        <!-- ===== Header End ===== -->
+
+        <!-- ===== Main Content Start ===== -->
+        <main>
+          <div class="mx-auto max-w-(--breakpoint-2xl) p-4 md:p-6">
+            <!-- Breadcrumb Start -->
+            <div x-data="{ pageName: 'Users' }">
+              <%- include('../../partials/breadcrumb.ejs') %>
+            </div>
+            <!-- Breadcrumb End -->
+
+            <!-- Search and Title -->
+            <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <h2 class="text-2xl font-bold text-gray-900 dark:text-white">User List</h2>
+              
+              <!-- Search Form -->
+              <form action="/users" method="GET" class="flex gap-2">
+                <input 
+                  type="text" 
+                  name="search" 
+                  value="<%= search %>" 
+                  placeholder="Search user..." 
+                  class="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 sm:w-64"
+                />
+                <button 
+                  type="submit" 
+                  class="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700"
+                >
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                  </svg>
+                  Search
+                </button>
+              </form>
+            </div>
+
+            <!-- Users Table -->
+            <div class="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
+              <div class="max-w-full overflow-x-auto">
+                <table class="min-w-full">
+                  <!-- table header -->
+                  <thead>
+                    <tr class="border-b border-gray-100 dark:border-gray-800">
+                      <th class="px-5 py-3 sm:px-6">
+                        <div class="flex items-center">
+                          <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Name</p>
+                        </div>
+                      </th>
+                      <th class="px-5 py-3 sm:px-6">
+                        <div class="flex items-center">
+                          <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Email</p>
+                        </div>
+                      </th>
+                      <th class="px-5 py-3 sm:px-6">
+                        <div class="flex items-center">
+                          <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Domisili</p>
+                        </div>
+                      </th>
+                      <th class="px-5 py-3 sm:px-6">
+                        <div class="flex items-center">
+                          <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Gender</p>
+                        </div>
+                      </th>
+                      <th class="px-5 py-3 sm:px-6">
+                        <div class="flex items-center">
+                          <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Status</p>
+                        </div>
+                      </th>
+                    </tr>
+                  </thead>
+                  <!-- table body -->
+                  <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+                    <% if (users && users.length > 0) { %>
+                      <% users.forEach(function(u) { %>
+                        <tr>
+                          <td class="px-5 py-4 sm:px-6">
+                            <div class="flex items-center gap-3">
+                              <div class="w-10 h-10 overflow-hidden rounded-full bg-purple-100 dark:bg-purple-500/10 flex items-center justify-center">
+                                <span class="text-purple-600 dark:text-purple-400 font-semibold text-sm">
+                                  <%= u.nama ? u.nama.charAt(0).toUpperCase() : 'U' %>
+                                </span>
+                              </div>
+                              <div>
+                                <span class="block font-medium text-gray-800 text-theme-sm dark:text-white/90">
+                                  <%= u.nama %>
+                                </span>
+                                <span class="block text-gray-500 text-theme-xs dark:text-gray-400">
+                                  User
+                                </span>
+                              </div>
+                            </div>
+                          </td>
+                          <td class="px-5 py-4 sm:px-6">
+                            <p class="text-gray-500 text-theme-sm dark:text-gray-400"><%= u.email %></p>
+                          </td>
+                          <td class="px-5 py-4 sm:px-6">
+                            <p class="text-gray-500 text-theme-sm dark:text-gray-400"><%= u.domisili || '-' %></p>
+                          </td>
+                          <td class="px-5 py-4 sm:px-6">
+                            <p class="text-gray-500 text-theme-sm dark:text-gray-400"><%= u.gender || '-' %></p>
+                          </td>
+                          <td class="px-5 py-4 sm:px-6">
+                            <p class="rounded-full bg-success-50 px-2 py-0.5 text-theme-xs font-medium text-success-700 dark:bg-success-500/15 dark:text-success-500">
+                              Active
+                            </p>
+                          </td>
+                        </tr>
+                      <% }); %>
+                    <% } else { %>
+                      <tr>
+                        <td colspan="5" class="px-5 py-8 text-center">
+                          <p class="text-gray-500 dark:text-gray-400">No users found.</p>
+                        </td>
+                      </tr>
+                    <% } %>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </main>
+        <!-- ===== Main Content End ===== -->
+      </div>
+      <!-- ===== Content Area End ===== -->
+    </div>
+    <!-- ===== Page Wrapper End ===== -->
+  </body>
+</html>

@@ -1,5 +1,6 @@
+<% if (error && error.length > 0) { %>
 <div
-  class="rounded-xl border border-error-500 bg-error-50 p-4 dark:border-error-500/30 dark:bg-error-500/15"
+  class="mb-5 rounded-xl border border-error-500 bg-error-50 p-4 dark:border-error-500/30 dark:bg-error-500/15"
 >
   <div class="flex items-start gap-3">
     <div class="-mt-0.5 text-error-500">
@@ -20,25 +21,18 @@
       </svg>
     </div>
 
-    <div>
+    <div class="flex-1">
       <h4 class="mb-1 text-sm font-semibold text-gray-800 dark:text-white/90">
         Error Message
       </h4>
 
       <p class="text-sm text-gray-500 dark:text-gray-400">
-        You can insert a description for the message here.The text relates to
-        the action that has been performed.
+        <%= error %>
       </p>
-
-      <a
-        href="#"
-        class="mt-3 inline-block text-sm font-medium text-gray-500 underline dark:text-gray-400"
-      >
-        Learn more
-      </a>
     </div>
   </div>
 </div>
+<% } %>
 
 <div
   class="rounded-xl border border-error-500 bg-error-50 p-4 dark:border-error-500/30 dark:bg-error-500/15"

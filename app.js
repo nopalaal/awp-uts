@@ -8,6 +8,11 @@ const { testConnection } = require('./src/models/koneksi');
 const { setUserLocals } = require('./src/controller/middleware/auth');
 const loginRoutes = require('./src/routes/login');
 const dashboardRoutes = require('./src/routes/dashboard');
+const calendarRoutes = require('./src/routes/calendar');
+const employeeRoutes = require('./src/routes/employee');
+const userRoutes = require('./src/routes/users');
+const taskRoutes = require('./src/routes/tasks');
+const oauthRoutes = require('./src/routes/oauth');
 const app = express();
 const PORT = process.env.PORT || 3001;
 
@@ -49,6 +54,11 @@ app.use(setUserLocals);
 // Routes
 app.use('/', loginRoutes);
 app.use('/dashboard', dashboardRoutes);
+app.use('/calendar', calendarRoutes);
+app.use('/employee', employeeRoutes);
+app.use('/users', userRoutes);
+app.use('/tasks', taskRoutes);
+app.use('/', oauthRoutes); // OAuth callback route
 
 app.get('/',(req,res)=>{
         if (req.session && req.session.user){

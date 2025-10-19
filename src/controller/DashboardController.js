@@ -1,4 +1,5 @@
-const { user: User, task: Task } = require('../models');
+const { user: User, task: Task, event: Event, mediapartner: MediaPartner } = require('../models');
+const { Op } = require('sequelize');
 
 class DashboardController {
   // Main dashboard
@@ -6,21 +7,66 @@ class DashboardController {
     try {
       const user = req.session.user;
       
-      // Get statistics based on user role
+      // Get statistics
       let stats = {};
       
-      if (user.role === 'manager') {
-        // stats = await User.getStats();
-        // Add more manager statistics here
+      try {
+        // Count total users
+        const totalUsers = await User.count();
+        
+        // Count total media partners
+        const totalMediaPartners = await MediaPartner.count();
+        
+        // Count events for this month
+        const now = new Date();
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+        
+        const eventsThisMonth = await Event.count({
+          where: {
+            tanggal: {
+              [Op.between]: [startOfMonth, endOfMonth]
+            }
+          }
+        });
+        
+        stats = {
+          totalUsers,
+          totalMediaPartners,
+          eventsThisMonth
+        };
+        
+        console.log('Dashboard stats:', stats);
+      } catch (statsError) {
+        console.error('Error fetching stats:', statsError);
       }
 
-      // Get tasks data
+      // Get tasks data - limit to 5 for dashboard with employee and admin names
       let tasks = [];
       try {
         tasks = await Task.findAll({
-          limit: 10,
-          order: [['tanggalAkhir', 'ASC']]
+          limit: 5,
+          order: [['tanggalAkhir', 'ASC']],
+          include: [
+            {
+              model: User,
+              as: 'employee',
+              attributes: ['idUser', 'nama'],
+              required: false
+            },
+            {
+              model: User,
+              as: 'admin',
+              attributes: ['idUser', 'nama'],
+              required: false
+            }
+          ]
         });
+        
+        // Debug: log tasks with associations
+        if (tasks.length > 0) {
+          console.log('Sample task data:', JSON.stringify(tasks[0], null, 2));
+        }
       } catch (taskError) {
         console.error('Error fetching tasks:', taskError);
       }

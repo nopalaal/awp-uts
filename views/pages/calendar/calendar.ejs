@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+    />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Calendar - Mudjarap</title>
+
+    <link rel="stylesheet" href="/src/css/output.css" />
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    <!-- FullCalendar CSS -->
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css' rel='stylesheet' />
+    
+    <style>
+      [x-cloak] { display: none !important; }
+    </style>
+  </head>
+  <body
+    x-data="{ 
+      page: 'calendar',
+      pageName: 'Calendar',
+      activePage: '<%= activePage %>', 
+      'loaded': true, 
+      'darkMode': false, 
+      'stickyMenu': false, 
+      'sidebarToggle': false, 
+      'scrollTop': false,
+      'selected': ''
+    }" 
+      'scrollTop': false 
+    }"
+    x-init="
+         darkMode = JSON.parse(localStorage.getItem('darkMode'));
+         $watch('darkMode', value => localStorage.setItem('darkMode', JSON.stringify(value)))"
+    :class="{'dark bg-gray-900': darkMode === true}"
+  >
+    <!-- ===== Preloader Start ===== -->
+    <%- include('../../partials/preloader.ejs') %>
+    <!-- ===== Preloader End ===== -->
+
+    <!-- ===== Page Wrapper Start ===== -->
+    <div class="flex h-screen overflow-hidden">
+      <!-- ===== Sidebar Start ===== -->
+      <%- include('../../partials/sidebar.ejs') %>
+      <!-- ===== Sidebar End ===== -->
+
+      <!-- ===== Content Area Start ===== -->
+      <div
+        class="relative flex flex-1 flex-col overflow-y-auto overflow-x-hidden"
+      >
+        <!-- Small Device Overlay Start -->
+        <%- include('../../partials/overlay.ejs') %>
+        <!-- Small Device Overlay End -->
+
+        <!-- ===== Header Start ===== -->
+        <%- include('../../partials/header.ejs') %>
+        <!-- ===== Header End ===== -->
+
+        <!-- ===== Main Content Start ===== -->
+        <main>
+          <div class="mx-auto max-w-(--breakpoint-2xl) p-4 md:p-6">
+            <!-- Breadcrumb Start -->
+            <%- include('../../partials/breadcrumb.ejs') %>
+            <!-- Breadcrumb End -->
+
+            <div
+              class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]"
+            >
+              <div id="calendar"></div>
+            </div>
+
+            <!-- BEGIN MODAL -->
+            <%- include('../../partials/calendar-event-modal.ejs') %>
+            <!-- END MODAL -->
+          </div>
+        </main>
+        <!-- ===== Main Content End ===== -->
+      </div>
+      <!-- ===== Content Area End ===== -->
+    </div>
+    <!-- ===== Page Wrapper End ===== -->
+
+    <!-- Event Modal -->
+    <%- include('../../partials/calendar-event-modal.ejs') %>
+
+    <!-- FullCalendar JS -->
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
+    
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const calendarEl = document.getElementById('calendar');
+        const modal = document.getElementById('eventModal');
+        const modalTitle = document.getElementById('event-title');
+        const modalStartDate = document.getElementById('event-start-date');
+        const modalEndDate = document.getElementById('event-end-date');
+        const addBtn = document.querySelector('.btn-add-event');
+        const updateBtn = document.querySelector('.btn-update-event');
+        
+        // Modal functions
+        function openModal() {
+          modal.classList.remove('hidden');
+          modal.classList.add('flex');
+        }
+        
+        function closeModal() {
+          modal.classList.add('hidden');
+          modal.classList.remove('flex');
+          modalTitle.value = '';
+          modalStartDate.value = '';
+          modalEndDate.value = '';
+        }
+        
+        // Close modal on close button click
+        document.querySelectorAll('.modal-close-btn').forEach(btn => {
+          btn.addEventListener('click', closeModal);
+        });
+        
+        // Close modal on backdrop click
+        modal.addEventListener('click', function(e) {
+          if (e.target === modal || e.target.classList.contains('modal-close-btn')) {
+            closeModal();
+          }
+        });
+        
+        // Events from server
+        const events = <%- eventsJson %>;
+        
+        console.log('Loading calendar with events:', events);
+        
+        const calendar = new FullCalendar.Calendar(calendarEl, {
+          initialView: 'dayGridMonth',
+          headerToolbar: {
+            left: 'prev,next', // removed 'today' as requested
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,listWeek'
+          },
+          events: events,
+          eventClick: function(info) {
+            // Show event details in modal (read-only mode)
+            modalTitle.value = info.event.title;
+            modalTitle.disabled = true;
+
+            const eventDate = info.event.start;
+            const dateStr = eventDate.toISOString().split('T')[0];
+            modalStartDate.value = dateStr;
+            modalStartDate.disabled = true;
+            modalEndDate.value = dateStr;
+            modalEndDate.disabled = true;
+
+            // Hide add/update buttons when viewing
+            addBtn.style.display = 'none';
+            updateBtn.style.display = 'none';
+
+            // Populate additional info area (status / owner) if available
+            const infoEl = document.getElementById('event-info');
+            if (infoEl) {
+              const ext = info.event.extendedProps || {};
+              let html = '';
+              if (ext.type === 'task') {
+                const status = ext.status || 'Unknown';
+                // status color mapping (match controller)
+                const map = {
+                  'Pending': 'bg-orange-400 text-white',
+                  'In Progress': 'bg-blue-400 text-white',
+                  'Selesai': 'bg-green-400 text-white',
+                  'Revisi': 'bg-red-400 text-white'
+                };
+                const cls = map[status] || 'bg-gray-400 text-white';
+                html += `<div class="flex items-center gap-3 mb-3">`;
+                html += `<span class="px-2 py-1 rounded-full text-xs font-semibold ${cls}">${status}</span>`;
+                html += `</div>`;
+              }
+              if (info.event.extendedProps.location) {
+                html += `<div class="text-sm text-gray-700 dark:text-gray-300">Assignee: <strong>${info.event.extendedProps.location}</strong></div>`;
+              }
+              if (info.event.extendedProps.description) {
+                html += `<div class="mt-3 text-sm text-gray-600 dark:text-gray-400">${info.event.extendedProps.description}</div>`;
+              }
+              infoEl.innerHTML = html;
+            }
+
+            openModal();
+          },
+          dateClick: function(info) {
+            // Add new event on date click
+            modalTitle.value = '';
+            modalTitle.disabled = false;
+            modalStartDate.value = info.dateStr;
+            modalStartDate.disabled = false;
+            modalEndDate.value = info.dateStr;
+            modalEndDate.disabled = false;
+            
+            // Show add button
+            addBtn.style.display = 'flex';
+            updateBtn.style.display = 'none';
+            
+            openModal();
+          },
+          eventTimeFormat: {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false
+          },
+          height: 'auto',
+          contentHeight: 650,
+          navLinks: true,
+          editable: false,
+          dayMaxEvents: 3,
+          locale: 'id',
+          buttonText: {
+            today: 'Hari Ini',
+            month: 'Bulan',
+            week: 'Minggu',
+            list: 'List'
+          },
+          views: {
+            dayGridMonth: {
+              titleFormat: { year: 'numeric', month: 'long' }
+            }
+          }
+        });
+        
+        calendar.render();
+        
+        // Add event button handler (you can implement this to save to DB)
+        addBtn.addEventListener('click', function() {
+          const title = modalTitle.value;
+          const startDate = modalStartDate.value;
+          const endDate = modalEndDate.value;
+          
+          if (title && startDate) {
+            // Here you can send data to server to save
+            alert('Feature add event akan diimplementasi dengan endpoint API');
+            closeModal();
+          } else {
+            alert('Please fill in event title and date');
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Task Management - Mudjarap</title>
+    <link rel="stylesheet" href="/src/css/output.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
+      [x-cloak] { display: none !important; }
+    </style>
+</head>
+<body
+    x-data="{ page: 'tasks', pageName: 'Task Management', activePage: '<%= activePage %>', 'loaded': true, 'darkMode': false, 'stickyMenu': false, 'sidebarToggle': false, 'scrollTop': false, 'selected': '' }"
+    x-init="
+         darkMode = JSON.parse(localStorage.getItem('darkMode'));
+         $watch('darkMode', value => localStorage.setItem('darkMode', JSON.stringify(value)))"
+    :class="{'dark bg-gray-900': darkMode === true}"
+>
+    
+    <%- include('../../partials/preloader') %>
+    
+    <div class="flex h-screen overflow-hidden" :class="{'dark:bg-boxdark-2 dark:text-bodydark': darkMode === true}">
+        
+        <%- include('../../partials/sidebar', {activePage}) %>
+        
+        <div class="relative flex flex-1 flex-col overflow-y-auto overflow-x-hidden">
+            
+            <%- include('../../partials/header') %>
+            
+            <main>
+                <div class="mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10">
+                    
+                    <%- include('../../partials/breadcrumb') %>
+
+                    <%- include('../../partials/alert/alert-success', { success: messages.success }) %>
+                    <%- include('../../partials/alert/alert-error', { error: messages.error }) %>
+
+                    <!-- Assign Task Form -->
+                    <div class="mb-6 rounded-xl border border-stroke   shadow-default dark:border-strokedark dark:bg-boxdark">
+                        <div class="border-b border-stroke py-4 px-6.5 dark:border-strokedark">
+                            <h3 class="font-semibold text-black dark:text-white">
+                                Assign New Task
+                            </h3>
+                        </div>
+                        <form action="/tasks/assign" method="POST">
+                            <div class="p-6.5">
+                                <div class="mb-4.5">
+                                    <label class="mb-2.5 block text-sm font-medium text-black dark:text-white">
+                                        Assign to Employee <span class="text-meta-1">*</span>
+                                    </label>
+                                    <select name="idEmployee" required
+                                        class="relative z-20 w-full appearance-none rounded border border-stroke   py-3 px-5 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary">
+                                        <option value="" disabled selected>Select employee</option>
+                                        <% employees.forEach(function(employee) { %>
+                                            <option value="<%= employee.idUser %>">
+                                                <%= employee.nama %> - <%= employee.email %>
+                                            </option>
+                                        <% }); %>
+                                    </select>
+                                </div>
+
+                                <div class="mb-4.5">
+                                    <label class="mb-2.5 block text-sm font-medium text-black dark:text-white">
+                                        Task Name <span class="text-meta-1">*</span>
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name="namaTask"
+                                        placeholder="Enter task name"
+                                        required
+                                        class="w-full rounded border-[1.5px] border-stroke   py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled: r dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                                    />
+                                </div>
+
+                                <div class="mb-4.5">
+                                    <label class="mb-2.5 block text-sm font-medium text-black dark:text-white">
+                                        Description
+                                    </label>
+                                    <textarea
+                                        rows="4"
+                                        name="deskripsiTask"
+                                        placeholder="Enter task description"
+                                        class="w-full rounded border-[1.5px] border-stroke   py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled: r dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                                    ></textarea>
+                                </div>
+
+                                <div class="mb-4.5 flex flex-col gap-6 xl:flex-row">
+                                    <div class="w-full xl:w-1/2">
+                                        <label class="mb-2.5 block text-sm font-medium text-black dark:text-white">
+                                            Start Date <span class="text-meta-1">*</span>
+                                        </label>
+                                        <div class="relative">
+                                            <input
+                                                type="text"
+                                                name="tanggalMulai"
+                                                id="startDate"
+                                                required
+                                                placeholder="Select start date"
+                                                class="datepicker w-full rounded border-[1.5px] border-stroke   py-3 pl-12 pr-5 font-medium outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:text-white"
+                                            />
+                                            <div class="absolute inset-0 right-auto flex items-center pointer-events-none left-4">
+                                                <svg class="fill-current" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M6.66683 1.54199C7.08104 1.54199 7.41683 1.87778 7.41683 2.29199V3.00033H12.5835V2.29199C12.5835 1.87778 12.9193 1.54199 13.3335 1.54199C13.7477 1.54199 14.0835 1.87778 14.0835 2.29199V3.00033L15.4168 3.00033C16.5214 3.00033 17.4168 3.89576 17.4168 5.00033V7.50033V15.8337C17.4168 16.9382 16.5214 17.8337 15.4168 17.8337H4.5835C3.47893 17.8337 2.5835 16.9382 2.5835 15.8337V7.50033V5.00033C2.5835 3.89576 3.47893 3.00033 4.5835 3.00033L5.91683 3.00033V2.29199C5.91683 1.87778 6.25262 1.54199 6.66683 1.54199ZM6.66683 4.50033H4.5835C4.30735 4.50033 4.0835 4.72418 4.0835 5.00033V6.75033H15.9168V5.00033C15.9168 4.72418 15.693 4.50033 15.4168 4.50033H13.3335H6.66683ZM15.9168 8.25033H4.0835V15.8337C4.0835 16.1098 4.30735 16.3337 4.5835 16.3337H15.4168C15.693 16.3337 15.9168 16.1098 15.9168 15.8337V8.25033Z" fill=""/>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="w-full xl:w-1/2">
+                                        <label class="mb-2.5 block text-sm font-medium text-black dark:text-white">
+                                            Deadline <span class="text-meta-1">*</span>
+                                        </label>
+                                        <div class="relative">
+                                            <input
+                                                type="text"
+                                                name="tanggalPenyelesaian"
+                                                id="deadline"
+                                                required
+                                                placeholder="Select deadline"
+                                                class="datepicker w-full rounded border-[1.5px] border-stroke   py-3 pl-12 pr-5 font-medium outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:text-white"
+                                            />
+                                            <div class="absolute inset-0 right-auto flex items-center pointer-events-none left-4">
+                                                <svg class="fill-current" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M6.66683 1.54199C7.08104 1.54199 7.41683 1.87778 7.41683 2.29199V3.00033H12.5835V2.29199C12.5835 1.87778 12.9193 1.54199 13.3335 1.54199C13.7477 1.54199 14.0835 1.87778 14.0835 2.29199V3.00033L15.4168 3.00033C16.5214 3.00033 17.4168 3.89576 17.4168 5.00033V7.50033V15.8337C17.4168 16.9382 16.5214 17.8337 15.4168 17.8337H4.5835C3.47893 17.8337 2.5835 16.9382 2.5835 15.8337V7.50033V5.00033C2.5835 3.89576 3.47893 3.00033 4.5835 3.00033L5.91683 3.00033V2.29199C5.91683 1.87778 6.25262 1.54199 6.66683 1.54199ZM6.66683 4.50033H4.5835C4.30735 4.50033 4.0835 4.72418 4.0835 5.00033V6.75033H15.9168V5.00033C15.9168 4.72418 15.693 4.50033 15.4168 4.50033H13.3335H6.66683ZM15.9168 8.25033H4.0835V15.8337C4.0835 16.1098 4.30735 16.3337 4.5835 16.3337H15.4168C15.693 16.3337 15.9168 16.1098 15.9168 15.8337V8.25033Z" fill=""/>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-5 py-3.5 text-sm font-medium text-white shadow-md transition hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 bg-brand-500">
+                                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M10 4.16675V15.8334M4.16669 10.0001H15.8334" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                    Assign Task
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- All Tasks Table -->
+                    <div class="rounded-xl border border-stroke   shadow-default dark:border-strokedark dark:bg-boxdark">
+                        <div class="py-6 px-4 md:px-6 xl:px-7.5">
+                            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                                <h4 class="text-xl font-semibold text-black dark:text-white">
+                                    All Tasks
+                                </h4>
+                                
+                                <!-- Search Form -->
+                                <form method="GET" action="/tasks" class="relative">
+                                    <button type="submit" class="absolute left-0 top-1/2 -translate-y-1/2">
+                                        <svg class="fill-body hover:fill-primary dark:fill-bodydark dark:hover:fill-primary" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path fill-rule="evenodd" clip-rule="evenodd" d="M9.16666 3.33332C5.945 3.33332 3.33332 5.945 3.33332 9.16666C3.33332 12.3883 5.945 15 9.16666 15C12.3883 15 15 12.3883 15 9.16666C15 5.945 12.3883 3.33332 9.16666 3.33332ZM1.66666 9.16666C1.66666 5.02452 5.02452 1.66666 9.16666 1.66666C13.3088 1.66666 16.6667 5.02452 16.6667 9.16666C16.6667 13.3088 13.3088 16.6667 9.16666 16.6667C5.02452 16.6667 1.66666 13.3088 1.66666 9.16666Z" fill=""/>
+                                            <path fill-rule="evenodd" clip-rule="evenodd" d="M13.2857 13.2857C13.6112 12.9603 14.1388 12.9603 14.4642 13.2857L18.0892 16.9107C18.4147 17.2362 18.4147 17.7638 18.0892 18.0892C17.7638 18.4147 17.2362 18.4147 16.9107 18.0892L13.2857 14.4642C12.9603 14.1388 12.9603 13.6112 13.2857 13.2857Z" fill=""/>
+                                        </svg>
+                                    </button>
+                                    <input
+                                        type="text"
+                                        name="search"
+                                        value="<%= search %>"
+                                        placeholder="Search tasks..."
+                                        class="w-full bg-transparent pl-9 pr-4 font-medium focus:outline-none xl:w-125"
+                                    />
+                                </form>
+                            </div>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full table-auto">
+                                <thead>
+                                    <tr class="bg-gray-2 text-left dark:bg-meta-4">
+                                        <th class="min-w-[150px] py-4 px-4 font-medium text-black dark:text-white xl:pl-11">
+                                            Employee
+                                        </th>
+                                        <th class="min-w-[150px] py-4 px-4 font-medium text-black dark:text-white">
+                                            Task Name
+                                        </th>
+                                        <th class="min-w-[200px] py-4 px-4 font-medium text-black dark:text-white">
+                                            Description
+                                        </th>
+                                        <th class="min-w-[120px] py-4 px-4 font-medium text-black dark:text-white">
+                                            Start Date
+                                        </th>
+                                        <th class="min-w-[120px] py-4 px-4 font-medium text-black dark:text-white">
+                                            Deadline
+                                        </th>
+                                        <th class="min-w-[100px] py-4 px-4 font-medium text-black dark:text-white">
+                                            Status
+                                        </th>
+                                        <th class="py-4 px-4 font-medium text-black dark:text-white">
+                                            Submission
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% if (tasks.length === 0) { %>
+                                        <tr>
+                                            <td colspan="7" class="border-b border-[#eee] py-5 px-4 text-center dark:border-strokedark">
+                                                <p class="text-black dark:text-white">No tasks found.</p>
+                                            </td>
+                                        </tr>
+                                    <% } else { %>
+                                        <% tasks.forEach(function(task) { 
+                                            let statusColor = 'bg-warning';
+                                            let statusText = task.status;
+                                            
+                                            if (task.status === 'Selesai') {
+                                                statusColor = 'bg-success';
+                                            } else if (task.status === 'In Progress') {
+                                                statusColor = 'bg-primary';
+                                            } else if (task.status === 'Revisi') {
+                                                statusColor = 'bg-danger';
+                                            }
+                                            
+                                            const startDate = task.tanggalMulai ? new Date(task.tanggalMulai).toLocaleDateString('id-ID') : '-';
+                                            const endDate = task.tanggalPenyelesaian ? new Date(task.tanggalPenyelesaian).toLocaleDateString('id-ID') : '-';
+                                            
+                                            // Get initials for avatar
+                                            const employeeName = task.employee ? task.employee.nama : 'Unknown';
+                                            const nameParts = employeeName.split(' ');
+                                            const initials = nameParts.length > 1 
+                                                ? nameParts[0][0] + nameParts[nameParts.length - 1][0]
+                                                : employeeName.substring(0, 2);
+                                        %>
+                                        <tr>
+                                            <td class="border-b border-[#eee] py-5 px-4 pl-9 dark:border-strokedark xl:pl-11">
+                                                <div class="flex items-center gap-3">
+                                                    <div class="flex-shrink-0">
+                                                        <div class="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-white font-medium">
+                                                            <%= initials.toUpperCase() %>
+                                                        </div>
+                                                    </div>
+                                                    <p class="text-black dark:text-white sm:block">
+                                                        <%= employeeName %>
+                                                    </p>
+                                                </div>
+                                            </td>
+                                            <td class="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
+                                                <h5 class="font-medium text-black dark:text-white">
+                                                    <%= task.namaTask %>
+                                                </h5>
+                                            </td>
+                                            <td class="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
+                                                <p class="text-black dark:text-white">
+                                                    <%= task.deskripsiTask ? task.deskripsiTask.substring(0, 80) + (task.deskripsiTask.length > 80 ? '...' : '') : '-' %>
+                                                </p>
+                                            </td>
+                                            <td class="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
+                                                <p class="text-black dark:text-white">
+                                                    <%= startDate %>
+                                                </p>
+                                            </td>
+                                            <td class="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
+                                                <p class="text-black dark:text-white">
+                                                    <%= endDate %>
+                                                </p>
+                                            </td>
+                                            <td class="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
+                                                <p class="inline-flex rounded-full <%= statusColor %> bg-opacity-10 py-1 px-3 text-sm font-medium <%= statusColor.replace('bg-', 'text-') %>">
+                                                    <%= statusText %>
+                                                </p>
+                                            </td>
+                                            <td class="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
+                                                <% if (task.urlContent) { %>
+                                                    <a href="<%= task.urlContent %>" target="_blank" 
+                                                       class="inline-flex items-center justify-center rounded-md bg-primary py-2 px-4 text-center font-medium text-white hover:bg-opacity-90 text-sm">
+                                                        View
+                                                    </a>
+                                                <% } else { %>
+                                                    <span class="text-gray-500 dark:text-gray-400">-</span>
+                                                <% } %>
+                                            </td>
+                                        </tr>
+                                        <% }); %>
+                                    <% } %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </main>
+            
+        </div>
+    </div>
+    
+    <script>
+        // Initialize Flatpickr for date inputs
+        flatpickr("#startDate", {
+            dateFormat: "Y-m-d",
+            altInput: true,
+            altFormat: "F j, Y",
+            minDate: "today"
+        });
+        
+        flatpickr("#deadline", {
+            dateFormat: "Y-m-d",
+            altInput: true,
+            altFormat: "F j, Y",
+            minDate: "today"
+        });
+    </script>
+</body>
+</html>
+

@@ -1,6 +1,6 @@
 const Sequelize = require('sequelize');
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('task', {
+  const Task = sequelize.define('task', {
     idTask: {
       autoIncrement: true,
       type: DataTypes.INTEGER,
@@ -81,4 +81,21 @@ module.exports = function(sequelize, DataTypes) {
       },
     ]
   });
+
+  // Define associations
+  Task.associate = function(models) {
+    // Association with User for employee
+    Task.belongsTo(models.user, {
+      foreignKey: 'idEmployee',
+      as: 'employee'
+    });
+    
+    // Association with User for admin
+    Task.belongsTo(models.user, {
+      foreignKey: 'idAdmin',
+      as: 'admin'
+    });
+  };
+
+  return Task;
 };
