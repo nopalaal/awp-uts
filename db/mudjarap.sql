@@ -18,6 +18,9 @@
 --
 -- Table structure for table `event`
 --
+GRANT ALL PRIVILEGES ON mudjarap.* TO 'AsepKnalpot'@'%';
+FLUSH PRIVILEGES;
+
 
 DROP TABLE IF EXISTS `event`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
