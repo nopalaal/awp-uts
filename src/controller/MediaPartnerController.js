@@ -20,17 +20,14 @@ const MediaPartnerController = {
         search,
         activePage: 'mediapartner',
         pageName: 'Media Partner',
+        success: req.flash('success'),
+        error: req.flash('error'),
       });
     } catch (error) {
       req.flash('error', 'Gagal memuat data Media Partner');
       res.redirect('/dashboard');
     }
   },
-  // Form tambah media partner (GET)
-  form: (req, res) => {
-    res.render('table/mediapartner-form');
-  },
-  // Proses tambah media partner (POST)
   create: async (req, res) => {
     try {
       const { namaMediaPartner, logoUrl, websiteUrl, kontakEmail } = req.body;
@@ -38,8 +35,41 @@ const MediaPartnerController = {
       req.flash('success', 'Media Partner berhasil ditambahkan!');
       res.redirect('/mediapartner');
     } catch (error) {
-      req.flash('error', 'Gagal menambah Media Partner: ' + error.message);
-      res.redirect('/mediapartner/form');
+      req.flash('error', 'Gagal tambah Media Partner: ' + error.message);
+      res.redirect('/mediapartner');
+    }
+  },
+  delete: async (req, res) => {
+    try {
+      const { id } = req.params;
+      await MediaPartner.destroy({ where: { idMediaPartner: id } });
+      req.flash('success', 'Media Partner berhasil dihapus!');
+      res.redirect('/mediapartner');
+    } catch (error) {
+      req.flash('error', 'Gagal hapus Media Partner: ' + error.message);
+      res.redirect('/mediapartner');
+    }
+  },
+  formEdit: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const mp = await MediaPartner.findByPk(id);
+      if (!mp) return res.status(404).json({error:'Media Partner tidak ditemukan'});
+      res.json(mp); // untuk AJAX modal
+    } catch (error) {
+      res.status(500).json({error: 'Gagal mengambil data Media Partner'});
+    }
+  },
+  update: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { namaMediaPartner, logoUrl, websiteUrl, kontakEmail } = req.body;
+      await MediaPartner.update({ namaMediaPartner, logoUrl, websiteUrl, kontakEmail }, { where: { idMediaPartner: id } });
+      req.flash('success', 'Media Partner berhasil diedit!');
+      res.redirect('/mediapartner');
+    } catch (error) {
+      req.flash('error', 'Gagal edit Media Partner: ' + error.message);
+      res.redirect('/mediapartner');
     }
   },
 };
