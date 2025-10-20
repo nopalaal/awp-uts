@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Media Partner - Mudjarap</title>
+    <link rel="stylesheet" href="/src/css/output.css" />
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
+      [x-cloak] { display: none !important; }
+    </style>
+  </head>
+  <body
+    x-data="{ page: 'mediapartner', pageName: 'Media Partner', activePage: 'mediapartner', loaded: true, darkMode: false, stickyMenu: false, sidebarToggle: false, scrollTop: false, selected: 'Tables' }"
+    x-init="darkMode = JSON.parse(localStorage.getItem('darkMode')); $watch('darkMode', value => localStorage.setItem('darkMode', JSON.stringify(value)))"
+    :class="{'dark bg-gray-900': darkMode === true}"
+  >
+    <%- include('../../partials/preloader.ejs') %>
+    <div class="flex h-screen overflow-hidden">
+      <%- include('../../partials/sidebar.ejs') %>
+      <div class="relative flex flex-1 flex-col overflow-y-auto overflow-x-hidden">
+        <%- include('../../partials/overlay.ejs') %>
+        <%- include('../../partials/header.ejs') %>
+        <main>
+          <div class="mx-auto max-w-(--breakpoint-2xl) p-4 md:p-6">
+            <div x-data="{ pageName: 'Media Partner' }">
+              <%- include('../../partials/breadcrumb.ejs') %>
+            </div>
+            <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Media Partner List</h2>
+              <form action="/mediapartner" method="GET" class="flex gap-2">
+                <input type="text" name="search" value="<%= search %>" placeholder="Search media partner..." class="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 sm:w-64 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400 transition-colors" />
+                <button type="submit" class="flex items-center gap-2 rounded-lg bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-50 disabled:cursor-not-allowed group relative overflow-hidden">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                  </svg>
+                  Search
+                </button>
+              </form>
+            </div>
+            <div x-data="{modalOpen:false, isEdit:false, editData:{}, loading:false}">
+              <div class="flex items-center mb-4">
+                <button @click="isEdit=false; editData={}; modalOpen=true" type="button" class="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white px-4 py-2 rounded transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-50 disabled:cursor-not-allowed group relative overflow-hidden">
+                  + Tambah Media Partner
+                </button>
+              </div>
+              <%- include('../../partials/alert/alert-success.ejs', { success }) %>
+              <%- include('../../partials/alert/alert-error.ejs', { error }) %>
+              <div x-show="modalOpen" class="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-40 dark:bg-black dark:bg-opacity-60">
+                <form :action="isEdit ? `/mediapartner/edit/${editData.idMediaPartner}` : '/mediapartner/create'" method="POST" class="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md shadow-2xl relative border border-gray-200 dark:border-gray-700">
+                  <h3 class="text-lg font-semibold mb-3 text-gray-900 dark:text-white" x-text="isEdit ? 'Edit Media Partner' : 'Tambah Media Partner'"></h3>
+                  <template x-if="isEdit && loading">
+                    <div class="text-gray-700 dark:text-gray-300 flex items-center justify-center py-4">
+                      <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 dark:border-blue-400 mr-2"></div>
+                      Loading...
+                    </div>
+                  </template>
+                  <template x-if="!loading">
+                    <div>
+                      <div class="mb-2">
+                        <label class="block mb-1 text-gray-700 dark:text-gray-300">Nama</label>
+                        <input name="namaMediaPartner" class="border border-gray-300 dark:border-gray-600 rounded p-2 w-full bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400 transition-colors" required x-model="editData.namaMediaPartner" :value="isEdit ? editData.namaMediaPartner : ''" placeholder="Masukkan nama media partner" />
+                      </div>
+                      <div class="mb-2">
+                        <label class="block mb-1 text-gray-700 dark:text-gray-300">Logo (URL)</label>
+                        <input name="logoUrl" class="border border-gray-300 dark:border-gray-600 rounded p-2 w-full bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400 transition-colors" x-model="editData.logoUrl" :value="isEdit ? editData.logoUrl : ''" placeholder="https://example.com/logo.png" />
+                      </div>
+                      <div class="mb-2">
+                        <label class="block mb-1 text-gray-700 dark:text-gray-300">Website</label>
+                        <input name="websiteUrl" class="border border-gray-300 dark:border-gray-600 rounded p-2 w-full bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400 transition-colors" x-model="editData.websiteUrl" :value="isEdit ? editData.websiteUrl : ''" placeholder="https://example.com" />
+                      </div>
+                      <div class="mb-2">
+                        <label class="block mb-1 text-gray-700 dark:text-gray-300">Email Kontak</label>
+                        <input name="kontakEmail" type="email" class="border border-gray-300 dark:border-gray-600 rounded p-2 w-full bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-400 dark:focus:border-blue-400 transition-colors" x-model="editData.kontakEmail" :value="isEdit ? editData.kontakEmail : ''" placeholder="contact@example.com" />
+                      </div>
+                      <div class="flex justify-end gap-2 mt-4">
+                        <button type="button" @click="modalOpen=false" class="bg-gray-500 hover:bg-gray-600 dark:bg-gray-600 dark:hover:bg-gray-700 text-white px-3 py-1 rounded transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-50 disabled:cursor-not-allowed group">Batal</button>
+                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white px-4 py-1 rounded transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-50 disabled:cursor-not-allowed group" x-show="!isEdit">Tambah</button>
+                        <button type="submit" class="bg-yellow-500 hover:bg-yellow-600 dark:bg-yellow-600 dark:hover:bg-yellow-700 text-white px-4 py-1 rounded transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-50 disabled:cursor-not-allowed group" x-show="isEdit">Edit</button>
+                      </div>
+                    </div>
+                  </template>
+                </form>
+              </div>
+
+              <div class="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
+                <div class="max-w-full overflow-x-auto">
+                  <table class="min-w-full">
+                    <thead>
+                      <tr class="border-b border-gray-100 dark:border-gray-800">
+                        <th class="px-5 py-3 sm:px-6 text-gray-700 dark:text-gray-300">Nama</th>
+                        <th class="px-5 py-3 sm:px-6 text-gray-700 dark:text-gray-300">Logo</th>
+                        <th class="px-5 py-3 sm:px-6 text-gray-700 dark:text-gray-300">Website</th>
+                        <th class="px-5 py-3 sm:px-6 text-gray-700 dark:text-gray-300">Email Kontak</th>
+                        <th class="px-5 py-3 sm:px-6 text-gray-700 dark:text-gray-300">Aksi</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+                    <% if (mediaPartners && mediaPartners.length > 0) { %>
+                      <% mediaPartners.forEach(function(mp) { %>
+                        <tr class="text-gray-700 dark:text-gray-300">
+                          <td class="px-5 py-4 sm:px-6"><%= mp.namaMediaPartner %></td>
+                          <td class="px-5 py-4 sm:px-6"><% if(mp.logoUrl){ %><img src="<%= mp.logoUrl %>" alt="Logo" width="40" height="40"/><% } else { %>-<% } %></td>
+                          <td class="px-5 py-4 sm:px-6"><% if(mp.websiteUrl){ %><a href="<%= mp.websiteUrl %>" target="_blank" class="text-blue-600 dark:text-blue-400 underline hover:text-blue-800 dark:hover:text-blue-300"><%= mp.websiteUrl %></a><% } else { %>-<% } %></td>
+                          <td class="px-5 py-4 sm:px-6"><%= mp.kontakEmail || '-' %></td>
+                          <td class="px-5 py-4 sm:px-6">
+                            <button type="button" class="bg-yellow-500 hover:bg-yellow-600 dark:bg-yellow-600 dark:hover:bg-yellow-700 text-white px-3 py-1 rounded text-xs transition-all duration-300 mr-1 shadow-md hover:shadow-lg transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-50 disabled:cursor-not-allowed group"
+                              @click="isEdit=true; loading=true; modalOpen=true; fetch(`/mediapartner/edit/<%= mp.idMediaPartner %>`).then(res=>res.json()).then(data=>{editData=data; loading=false;})">
+                              Edit
+                            </button>
+                            <form method="POST" action="/mediapartner/delete/<%= mp.idMediaPartner %>" onsubmit="return confirm('Yakin ingin hapus?');" style="display:inline">
+                              <button type="submit" class="bg-red-400 hover:bg-red-500 dark:bg-red-500 dark:hover:bg-red-600 text-white px-3 py-1 rounded text-xs transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-50 disabled:cursor-not-allowed group">Hapus</button>
+                            </form>
+                          </td>
+                        </tr>
+                      <% }); %>
+                    <% } else { %>
+                      <tr>
+                        <td colspan="5" class="px-5 py-8 text-center">
+                          <p class="text-gray-500 dark:text-gray-400">No media partner found.</p>
+                        </td>
+                      </tr>
+                    <% } %>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+  </body>
+</html>
