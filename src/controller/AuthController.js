@@ -68,8 +68,8 @@ class AuthController {
 
   // Show register form (optional)
   static showRegister(req, res) {
-    res.render('auth/register', {
-      title: 'Register - Mudjarap Dashboard',
+    res.render('signup/signup', {
+      title: 'Sign Up - Mudjarap Dashboard',
       error: req.flash('error'),
       success: req.flash('success')
     });
@@ -78,10 +78,10 @@ class AuthController {
   // Process register (optional)
   static async processRegister(req, res) {
     try {
-      const { username, nama, email, password, confirmPassword } = req.body;
+      const { username, nama, email, password, confirmPassword, tanggalLahir, domisili, gender } = req.body;
 
       if (!username || !nama || !email || !password || !confirmPassword) {
-        req.flash('error', 'Semua field harus diisi');
+        req.flash('error', 'Username, nama, email, password, dan konfirmasi password harus diisi');
         return res.redirect('/register');
       }
 
@@ -102,12 +102,22 @@ class AuthController {
         return res.redirect('/register');
       }
 
+      // Check if email already exists
+      const existingEmail = await User.findOne({ where: { email } });
+      if (existingEmail) {
+        req.flash('error', 'Email sudah digunakan');
+        return res.redirect('/register');
+      }
+
       // Create new user
       await User.create({
         username,
         nama,
         email,
         password,
+        tanggalLahir: tanggalLahir || null,
+        domisili: domisili || null,
+        gender: gender || null,
         role: 'user'
       });
 
