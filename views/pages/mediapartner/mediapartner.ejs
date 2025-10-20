@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Media Partner - Mudjarap</title>
+    <link rel="stylesheet" href="/src/css/output.css" />
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
+      [x-cloak] { display: none !important; }
+    </style>
+  </head>
+  <body
+    x-data="{ page: 'mediapartner', pageName: 'Media Partner', activePage: 'mediapartner', loaded: true, darkMode: false, stickyMenu: false, sidebarToggle: false, scrollTop: false, selected: 'Tables' }"
+    x-init="darkMode = JSON.parse(localStorage.getItem('darkMode')); $watch('darkMode', value => localStorage.setItem('darkMode', JSON.stringify(value)))"
+    :class="{'dark bg-gray-900': darkMode === true}"
+  >
+    <%- include('../../partials/preloader.ejs') %>
+    <div class="flex h-screen overflow-hidden">
+      <%- include('../../partials/sidebar.ejs') %>
+      <div class="relative flex flex-1 flex-col overflow-y-auto overflow-x-hidden">
+        <%- include('../../partials/overlay.ejs') %>
+        <%- include('../../partials/header.ejs') %>
+        <main>
+          <div class="mx-auto max-w-(--breakpoint-2xl) p-4 md:p-6">
+            <div x-data="{ pageName: 'Media Partner' }">
+              <%- include('../../partials/breadcrumb.ejs') %>
+            </div>
+            <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Media Partner List</h2>
+              <form action="/mediapartner" method="GET" class="flex gap-2">
+                <input type="text" name="search" value="<%= search %>" placeholder="Search media partner..." class="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 sm:w-64" />
+                <button type="submit" class="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                  </svg>
+                  Search
+                </button>
+              </form>
+            </div>
+            <div class="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
+              <div class="max-w-full overflow-x-auto">
+                <table class="min-w-full">
+                  <thead>
+                    <tr class="border-b border-gray-100 dark:border-gray-800">
+                      <th class="px-5 py-3 sm:px-6">Nama</th>
+                      <th class="px-5 py-3 sm:px-6">Logo</th>
+                      <th class="px-5 py-3 sm:px-6">Website</th>
+                      <th class="px-5 py-3 sm:px-6">Email Kontak</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+                  <% if (mediaPartners && mediaPartners.length > 0) { %>
+                    <% mediaPartners.forEach(function(mp) { %>
+                    <tr>
+                      <td class="px-5 py-4 sm:px-6"><%= mp.namaMediaPartner %></td>
+                      <td class="px-5 py-4 sm:px-6">
+                        <% if(mp.logoUrl){ %>
+                          <img src="<%= mp.logoUrl %>" alt="Logo" width="40" height="40"/>
+                        <% } else { %>-<% } %>
+                      </td>
+                      <td class="px-5 py-4 sm:px-6">
+                        <% if(mp.websiteUrl){ %><a href="<%= mp.websiteUrl %>" target="_blank" class="text-blue-600 underline"><%= mp.websiteUrl %></a><% } else { %>-<% } %>
+                      </td>
+                      <td class="px-5 py-4 sm:px-6"><%= mp.kontakEmail || '-' %></td>
+                    </tr>
+                    <% }); %>
+                  <% } else { %>
+                    <tr>
+                      <td colspan="4" class="px-5 py-8 text-center">
+                        <p class="text-gray-500 dark:text-gray-400">No media partner found.</p>
+                      </td>
+                    </tr>
+                  <% } %>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+  </body>
+</html>
