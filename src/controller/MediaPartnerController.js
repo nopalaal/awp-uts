@@ -16,6 +16,7 @@ const MediaPartnerController = {
         order: [['namaMediaPartner', 'ASC']]
       });
       res.render('mediapartner/mediapartner', {
+        user: req.session.user,
         mediaPartners,
         search,
         activePage: 'mediapartner',

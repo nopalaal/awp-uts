@@ -14,6 +14,7 @@ const userRoutes = require('./src/routes/users');
 const taskRoutes = require('./src/routes/tasks');
 const oauthRoutes = require('./src/routes/oauth');
 const mediaPartnerRoutes = require('./src/routes/mediapartner');
+const notificationRoutes = require('./src/routes/notification');
 const app = express();
 const PORT = process.env.PORT || 3001;
 
@@ -60,6 +61,7 @@ app.use('/employee', employeeRoutes);
 app.use('/users', userRoutes);
 app.use('/tasks', taskRoutes);
 app.use('/mediapartner', mediaPartnerRoutes);
+app.use('/', notificationRoutes);
 app.use('/', oauthRoutes); // OAuth callback route
 
 app.get('/',(req,res)=>{

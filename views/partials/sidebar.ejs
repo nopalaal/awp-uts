@@ -97,7 +97,8 @@
           </li>
           <!-- Menu Item Calendar -->
 
-          <!-- Menu Table-->
+          <% if (typeof user !== 'undefined' && user && user.role === 'admin') { %>
+          <!-- Menu Table (Admin Only) -->
            <li>
             <a
               href="#"
@@ -174,18 +175,12 @@
                     User
                   </a>
                 </li>
-        
-                <li>
-                  <a href="/mediapartner" class="menu-dropdown-item group" :class="activePage === 'mediapartner' ? 'menu-dropdown-item-active' : 'menu-dropdown-item-inactive'">
-                    Media Partner
-                  </a>
-                </li>
               </ul>
             </div>
             <!-- Dropdown Menu End -->
           </li>
+          <% } %>
 
-         
           <!-- Menu Item Tasks -->
           <li>
             <a
@@ -216,6 +211,37 @@
           </li>
           <!-- Menu Item Tasks -->
 
+          <% if (typeof user !== 'undefined' && user && user.role === 'admin') { %>
+          <!-- Menu Item Media Partner (Admin Only) -->
+          <li>
+            <a
+              href="/mediapartner"
+              class="group relative flex items-center gap-3 rounded-lg px-4 py-3 font-medium duration-300 ease-in-out"
+              :class="activePage === 'mediapartner' ? 'bg-blue-50 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400' : 'text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-white/5'"
+            >
+              <svg
+                :class="activePage === 'mediapartner' ? 'fill-blue-600 dark:fill-blue-400' : 'fill-gray-600 dark:fill-gray-400'"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill=""
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fill-rule="evenodd"
+                  clip-rule="evenodd"
+                  d="M12 3.25C7.30558 3.25 3.25 7.30558 3.25 12C3.25 16.6944 7.30558 20.75 12 20.75C16.6944 20.75 20.75 16.6944 20.75 12C20.75 7.30558 16.6944 3.25 12 3.25ZM4.75 12C4.75 8.13401 7.88401 4.75 12 4.75C15.866 4.75 19.25 8.13401 19.25 12C19.25 15.866 15.866 19.25 12 19.25C7.88401 19.25 4.75 15.866 4.75 12ZM12 8.25C11.5858 8.25 11.25 8.58579 11.25 9V12C11.25 12.1989 11.329 12.3897 11.4697 12.5303L13.9697 15.0303C14.2626 15.3232 14.7374 15.3232 15.0303 15.0303C15.3232 14.7374 15.3232 14.2626 15.0303 13.9697L12.75 11.6893V9C12.75 8.58579 12.4142 8.25 12 8.25Z"
+                  fill=""
+                />
+              </svg>
+
+              <span :class="sidebarToggle ? 'lg:hidden' : ''">
+                Media Partner
+              </span>
+            </a>
+          </li>
+          <% } %>
+          <!-- Menu Item Media Partner -->
 
         </ul>
       </div>

@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="/components/notification.js"></script>
     <style>
       [x-cloak] { display: none !important; }
     </style>
@@ -36,8 +37,13 @@
                     
                     <%- include('../../partials/breadcrumb') %>
 
-                    <%- include('../../partials/alert/alert-success', { success: messages.success }) %>
-                    <%- include('../../partials/alert/alert-error', { error: messages.error }) %>
+                    <% if (messages.success && messages.success.length > 0) { %>
+                        <%- include('../../partials/alert/alert-success', { success: messages.success[0] }) %>
+                    <% } %>
+                    
+                    <% if (messages.error && messages.error.length > 0) { %>
+                        <%- include('../../partials/alert/alert-error', { error: messages.error[0] }) %>
+                    <% } %>
 
                     <!-- Assign Task Form -->
                     <div class="mb-6 rounded-xl border border-stroke   shadow-default dark:border-strokedark dark:bg-boxdark">
@@ -82,7 +88,7 @@
                                     </label>
                                     <textarea
                                         rows="4"
-                                        name="deskripsiTask"
+                                        name="deskripsi"
                                         placeholder="Enter task description"
                                         class="w-full rounded border-[1.5px] border-stroke   py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled: r dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
                                     ></textarea>
@@ -117,7 +123,7 @@
                                         <div class="relative">
                                             <input
                                                 type="text"
-                                                name="tanggalPenyelesaian"
+                                                name="tanggalAkhir"
                                                 id="deadline"
                                                 required
                                                 placeholder="Select deadline"
@@ -217,7 +223,7 @@
                                             }
                                             
                                             const startDate = task.tanggalMulai ? new Date(task.tanggalMulai).toLocaleDateString('id-ID') : '-';
-                                            const endDate = task.tanggalPenyelesaian ? new Date(task.tanggalPenyelesaian).toLocaleDateString('id-ID') : '-';
+                                            const endDate = task.tanggalAkhir ? new Date(task.tanggalAkhir).toLocaleDateString('id-ID') : '-';
                                             
                                             // Get initials for avatar
                                             const employeeName = task.employee ? task.employee.nama : 'Unknown';
@@ -246,7 +252,7 @@
                                             </td>
                                             <td class="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
                                                 <p class="text-black dark:text-white">
-                                                    <%= task.deskripsiTask ? task.deskripsiTask.substring(0, 80) + (task.deskripsiTask.length > 80 ? '...' : '') : '-' %>
+                                                    <%= task.deskripsi ? task.deskripsi.substring(0, 80) + (task.deskripsi.length > 80 ? '...' : '') : '-' %>
                                                 </p>
                                             </td>
                                             <td class="border-b border-[#eee] py-5 px-4 dark:border-strokedark">

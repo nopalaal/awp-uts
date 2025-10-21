@@ -33,7 +33,8 @@ const TaskController = {
           user: currentUser,
           activePage: 'tasks',
           tasks: myTasks,
-          search: search
+          search: search,
+          messages: req.flash()
         });
         
       } else if (currentUser.role === 'admin') {
@@ -68,7 +69,8 @@ const TaskController = {
           activePage: 'tasks',
           tasks: allTasks,
           employees: employees,
-          search: search
+          search: search,
+          messages: req.flash()
         });
         
       } else {
@@ -159,7 +161,7 @@ const TaskController = {
       }
       
       // Create new task
-      await Task.create({
+      const newTask = await Task.create({
         namaTask: namaTask,
         deskripsi: deskripsi,
         idEmployee: idEmployee,
@@ -171,6 +173,17 @@ const TaskController = {
       
       // Get employee info for message
       const employee = await User.findByPk(idEmployee);
+      
+      // Create notification for employee
+      const NotificationController = require('./NotificationController');
+      await NotificationController.createNotification(
+        idEmployee,
+        'New Task Assigned',
+        `You have been assigned a new task: "${namaTask}". Deadline: ${new Date(tanggalAkhir).toLocaleDateString('id-ID')}`,
+        'task',
+        newTask.idTask
+      );
+      
       req.flash('success', `✓ Task "${namaTask}" berhasil di-assign ke ${employee ? employee.nama : 'employee'}!`);
       res.redirect('/tasks');
       

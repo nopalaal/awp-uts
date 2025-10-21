@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="/src/css/output.css" />
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script src="/components/notification.js"></script>
     
     <style>
       [x-cloak] { display: none !important; }
@@ -33,7 +34,7 @@
     <!-- ===== Page Wrapper Start ===== -->
     <div class="flex h-screen overflow-hidden">
       <!-- ===== Sidebar Start ===== -->
-      <%- include('../../partials/sidebar.ejs') %>
+      <%- include('../../partials/sidebar', {activePage: 'dashboard'}) %>
       <!-- ===== Sidebar End ===== -->
 
       <!-- ===== Content Area Start ===== -->
@@ -51,33 +52,68 @@
         <!-- ===== Main Content Start ===== -->
         <main>
           <div class="p-4 mx-auto max-w-(--breakpoint-2xl) md:p-6">
-            <div class="grid grid-cols-12 gap-4 md:gap-6">
-              <div class="col-span-12 space-y-6 xl:col-span-7">
-                <!-- Metric Group One -->
-                <%- include('../../partials/metric-group/metric-group-01.ejs') %>
-                <!-- Metric Group One -->
+            
+            <% if (user.role === 'employee') { %>
+              <!-- Employee Dashboard - Only Task and Calendar -->
+              <div class="mb-6">
+                <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-2">Welcome, <%= user.nama %>!</h2>
+                <p class="text-gray-600 dark:text-gray-400">Here are your tasks and schedule</p>
+              </div>
+              
+              <div class="grid grid-cols-1 gap-6">
+                <!-- Tasks Table -->
+                <div class="col-span-1">
+                  <%- include('../../partials/table/task.ejs') %>
+                </div>
+                
+                <!-- Quick Calendar Link -->
+                <div class="col-span-1">
+                  <div class="rounded-xl border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark p-6">
+                    <h3 class="text-xl font-semibold text-black dark:text-white mb-4">
+                      <svg class="inline-block w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                      </svg>
+                      Calendar & Schedule
+                    </h3>
+                    <p class="text-gray-600 dark:text-gray-400 mb-4">View your schedule and upcoming events</p>
+                    <a href="/calendar" class="inline-flex items-center justify-center rounded-lg bg-primary px-6 py-3 text-sm font-medium text-white hover:bg-primary/90">
+                      Open Calendar
+                      <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                      </svg>
+                    </a>
+                  </div>
+                </div>
+              </div>
+              
+            <% } else { %>
+              <!-- Admin Dashboard - Full Features -->
+              <div class="grid grid-cols-12 gap-4 md:gap-6">
+                <div class="col-span-12 space-y-6 xl:col-span-7">
+                  <!-- Metric Group One -->
+                  <%- include('../../partials/metric-group/metric-group-01.ejs') %>
+                  <!-- Metric Group One -->
+                </div>
+                
+                <div class="col-span-12 xl:col-span-5">
+                  <!-- ====== Chart Two Start -->
+                  <!-- ====== Chart Two End -->
+                </div>
 
-                <!-- ====== Chart One Start -->
-                <%- include('../../partials/chart/chart-01.ejs') %>
-                <!-- ====== Chart One End -->
-              </div>
-              <div class="col-span-12 xl:col-span-5">
-                <!-- ====== Chart Two Start -->
-                <!-- ====== Chart Two End -->
-              </div>
+                <div class="col-span-12 xl:col-span-5">
+                  <!-- ====== Map One Start -->
+                  <%- include('../../partials/demographic.ejs') %>
+                  <!-- ====== Map One End -->
+                </div>
 
-              <div class="col-span-12 xl:col-span-5">
-                <!-- ====== Map One Start -->
-                <%- include('../../partials/demographic.ejs') %>
-                <!-- ====== Map One End -->
+                <div class="col-span-12 xl:col-span-5">
+                  <!-- ====== Table One Start -->
+                  <%- include('../../partials/table/task.ejs') %>
+                  <!-- ====== Table One End -->
+                </div>
               </div>
-
-              <div class="col-span-12 xl:col-span-5">
-                <!-- ====== Table One Start -->
-                <%- include('../../partials/table/task.ejs') %>
-                <!-- ====== Table One End -->
-              </div>
-            </div>
+            <% } %>
+            
           </div>
         </main>
         <!-- ===== Main Content End ===== -->

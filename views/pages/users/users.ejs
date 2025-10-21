@@ -37,7 +37,7 @@
     <!-- ===== Page Wrapper Start ===== -->
     <div class="flex h-screen overflow-hidden">
       <!-- ===== Sidebar Start ===== -->
-      <%- include('../../partials/sidebar.ejs') %>
+      <%- include('../../partials/sidebar', {activePage: 'users'}) %>
       <!-- ===== Sidebar End ===== -->
 
       <!-- ===== Content Area Start ===== -->
@@ -93,6 +93,11 @@
                     <tr class="border-b border-gray-100 dark:border-gray-800">
                       <th class="px-5 py-3 sm:px-6">
                         <div class="flex items-center">
+                          <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">ID</p>
+                        </div>
+                      </th>
+                      <th class="px-5 py-3 sm:px-6">
+                        <div class="flex items-center">
                           <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Name</p>
                         </div>
                       </th>
@@ -123,6 +128,11 @@
                     <% if (users && users.length > 0) { %>
                       <% users.forEach(function(u) { %>
                         <tr>
+                          <td class="px-5 py-4 sm:px-6">
+                            <p class="font-medium text-gray-800 text-theme-sm dark:text-white/90">
+                              <%= u.idUser %>
+                            </p>
+                          </td>
                           <td class="px-5 py-4 sm:px-6">
                             <div class="flex items-center gap-3">
                               <div class="w-10 h-10 overflow-hidden rounded-full bg-purple-100 dark:bg-purple-500/10 flex items-center justify-center">
@@ -158,7 +168,7 @@
                       <% }); %>
                     <% } else { %>
                       <tr>
-                        <td colspan="5" class="px-5 py-8 text-center">
+                        <td colspan="6" class="px-5 py-8 text-center">
                           <p class="text-gray-500 dark:text-gray-400">No users found.</p>
                         </td>
                       </tr>

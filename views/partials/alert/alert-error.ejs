@@ -1,4 +1,4 @@
-<% if (error && error.length > 0) { %>
+<% if (error && (typeof error === 'string' ? error.trim() : error.length > 0)) { %>
 <div
   class="mb-5 rounded-xl border border-error-500 bg-error-50 p-4 dark:border-error-500/30 dark:bg-error-500/15"
 >

@@ -44,6 +44,13 @@ class AuthController {
         photo_profile: user.photo_profile
       };
 
+      // Check if user has valid role
+      if (user.role !== 'admin' && user.role !== 'employee') {
+        req.flash('error', 'Akses ditolak. Hanya admin dan employee yang dapat mengakses sistem.');
+        req.session.destroy();
+        return res.redirect('/login');
+      }
+
       req.flash('success', `Selamat datang, ${user.nama}!`);
       res.redirect('/dashboard');
 

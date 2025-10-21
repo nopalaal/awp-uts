@@ -7,6 +7,14 @@ class DashboardController {
     try {
       const user = req.session.user;
       
+      // Check if user role is valid
+      if (!user.role || (user.role !== 'admin' && user.role !== 'employee')) {
+        return res.status(404).render('404', {
+          title: '404 - Page Not Found',
+          user: null
+        });
+      }
+      
       // Get statistics
       let stats = {};
       

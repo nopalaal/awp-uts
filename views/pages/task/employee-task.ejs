@@ -36,8 +36,13 @@
                     
                     <%- include('../../partials/breadcrumb') %>
 
-                    <%- include('../../partials/alert/alert-success', { success: messages.success }) %>
-                    <%- include('../../partials/alert/alert-error', { error: messages.error }) %>
+                    <% if (messages.success && messages.success.length > 0) { %>
+                        <%- include('../../partials/alert/alert-success', { success: messages.success[0] }) %>
+                    <% } %>
+                    
+                    <% if (messages.error && messages.error.length > 0) { %>
+                        <%- include('../../partials/alert/alert-error', { error: messages.error[0] }) %>
+                    <% } %>
 
                     <!-- Submit Task Form -->
                     <div class="mb-6 rounded-xl border border-stroke   shadow-default dark:border-strokedark dark:bg-boxdark">
